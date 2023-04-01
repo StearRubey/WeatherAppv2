@@ -1,8 +1,10 @@
-from ParseData import parse_data
+from ParseData import parse_data, parsecoordinates
 import tkinter as tk
 from kivy.properties import NumericProperty
 
 county_data = parse_data()
+county_data = parsecoordinates(county_data)
+print(county_data)
 
 import kivy
 kivy.require('2.1.0') # replace with your current kivy version !
@@ -24,6 +26,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
+from kivy.config import Config
 
 
 def show_home(hwid, mwid):
@@ -33,9 +36,7 @@ def show_home(hwid, mwid):
 def show_map(hwid, mwid, map):
   hide_widget(hwid)
   hide_widget(mwid, dohide=False)
-  longitude = NumericProperty(-105.7821)
-  latitude = NumericProperty(39.5501)
-  map.root.center_on(latitude, longitude)
+  map.center_on(39.5501, -105.7821)
   
 
 def hide_widget(wid, dohide=True):
@@ -52,14 +53,24 @@ def hide_widget(wid, dohide=True):
 class MyApp(App):
     def build(self):
       Window.size = (900 , 700)
+      self.icon = "icon.png"
+      self.title = "Fire Restrictions"
       root = GridLayout(cols = 2)
       Scroll = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
       layout = GridLayout(cols = 2)
       mapLayout = GridLayout(cols = 1)
       map = MapView(zoom=7, lat= 39.5501, lon= -105.7821, map_source = MapSource(max_zoom = 10, min_zoom = 7))
-      marker = MapMarker(lat= 39.5501, lon= -105.7821, source = "Checkmark.png")
-      map.add_marker(marker)
-
+      
+      # marker = MapMarker(lat= 39.5501, lon= -105.7821, source = "Checkmark.png")
+      # map.add_marker(marker)
+      markers=[]
+      
+      for county in county_data:
+        if 'lat' in county and 'long' in county:
+          marker = MapMarker(lat= county["lat"], lon= county["long"], source = "RedCircle.png" if county["restriction"] else "Checkmark.png")
+          map.add_marker(marker)
+          markers.append(marker)
+          
 
       mapLayout.add_widget(map)
       layout.size_hint_y= None
