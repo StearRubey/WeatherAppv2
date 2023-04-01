@@ -5,5 +5,5 @@ Step 1: Clone Repository
 
 Step 2: In a Command prompt, run: pip install -r requirements.txt
 
-Step 3: Run main.py
+Step 3: Run python main.py
 
